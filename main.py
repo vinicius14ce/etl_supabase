@@ -9,13 +9,21 @@ from sqlalchemy import create_engine, text
 env = Env()
 
 # Instancia da classe DatabaseConector / Acessar app.database.auth para analisar métodos. 
-db_connector_local = Conn(
+db_connector_local_ouro = Conn(
     password=env.password,
     host=env.host,
     port=int(env.port),
     database=env.database,
     user=env.user,
     schema='ouro'
+)
+db_connector_local_dm = Conn(
+    password=env.password,
+    host=env.host,
+    port=int(env.port),
+    database=env.database,
+    user=env.user,
+    schema='dm'
 )
 db_connector_web = Conn(
     password=env.password_web,
@@ -27,9 +35,9 @@ db_connector_web = Conn(
 ) 
 #------------------------------------------------------------------------------------------
 
-def main(sql, out_table, schema, dtypes):
+def main(sql, out_table, schema, dtypes, conn_in, conn_out):
     try: # url_local = db_connector_local.url
-        url_local = db_connector_local.url
+        url_local = conn_in.url
         print(100 * '=')
         print("URL de conexão LOCAL gerada:"+"\n"+f"{url_local}")
     except Exception as error:
@@ -43,7 +51,7 @@ def main(sql, out_table, schema, dtypes):
         raise SystemExit("Encerrando o programa devido a erro na geração da URL de conexão.")
 
     try: # url_web = db_connector_web.url
-        url_web = db_connector_web.url
+        url_web = conn_out.url
         print(100 * '=')
         print("URL de conexão WEB gerada:"+"\n"+f"{url_web}")
         print(100 * '=')
@@ -59,7 +67,7 @@ def main(sql, out_table, schema, dtypes):
 
     try: # data = db_connector_local.query_text()
         
-        data = db_connector_local.query_text(sql)
+        data = conn_in.query_text(sql)
         print("Consulta SQL executada com sucesso.")
         '''
         x,y = 0, 3
@@ -97,13 +105,14 @@ def main(sql, out_table, schema, dtypes):
     try: # df.to_sql(...)
         df.to_sql(
             name=out_table,
-            con=db_connector_web.get_engine(),
+            con=conn_out.get_engine(),
             schema=schema,
             if_exists='replace',
             index=False,
             dtype=dtypes
         )
         print("DataFrame enviado para o banco de dados WEB com sucesso.")
+        print(100 * '=')
     except Exception as error:
         log_error(
             stage="df.to_sql",
@@ -114,7 +123,43 @@ def main(sql, out_table, schema, dtypes):
 
 
 if __name__ == "__main__":
-    main(sql=sql.ouro, dtypes=sql.schema_ouro, out_table='base_ouro', schema='dw')  
+    main(
+        sql=sql.ouro,
+        dtypes=sql.dtype_ouro,
+        out_table='base_ouro',
+        schema='dw',
+        conn_in=db_connector_local_ouro,
+        conn_out=db_connector_web
+    )
+    
+    main(
+        sql=sql.dm_artista,
+        dtypes=sql.dtype_dm_artista,
+        out_table='dm_artista',
+        schema='dw',
+        conn_in=db_connector_local_dm,
+        conn_out=db_connector_web
+        )
+
+    main(
+        sql=sql.dm_estado,
+        dtypes=sql.dtype_dm_estado,
+        out_table='dm_estado',
+        schema='dw',
+        conn_in=db_connector_local_dm,
+        conn_out=db_connector_web
+        )
+
+    main(
+        sql=sql.dm_parceiros,
+        dtypes=sql.dtype_dm_parceiros,
+        out_table='dm_parceiro',
+        schema='dw',
+        conn_in=db_connector_local_dm,
+        conn_out=db_connector_web
+        )
+    
+
 
 
 # cria a classe de pipeline com os metodos precisos para tratar os dados e subir na formatação certa. 
