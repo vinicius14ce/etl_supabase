@@ -2,6 +2,7 @@ from app.core.database import Conn
 from app.core.logger import log_error
 from app.core.env import Env
 from app.sql import sql
+from app.pipeline.pipeline import correct_value
 #==============================================
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -100,17 +101,18 @@ def main(sql, out_table, schema, dtypes, conn_in, conn_out):
         )
         raise SystemExit("Encerrando o programa devido a erro na criação do DataFrame.")
 
-    schema_types = {col: df[col].dtype for col in df.columns}
-
     try: # df.to_sql(...)
-        df.to_sql(
-            name=out_table,
-            con=conn_out.get_engine(),
-            schema=schema,
-            if_exists='replace',
-            index=False,
-            dtype=dtypes
-        )
+        with conn_out.get_engine().begin() as conn:
+            conn.execute(text(f"truncate table {out_table};"))
+            df.to_sql(
+                name=out_table,
+                con=conn,
+                schema=schema,
+                if_exists='append',
+                index=False,
+                dtype=dtypes,
+                chunksize=1000
+            )
         print("DataFrame enviado para o banco de dados WEB com sucesso.")
         print(100 * '=')
     except Exception as error:
@@ -153,7 +155,7 @@ if __name__ == "__main__":
     main(
         sql=sql.dm_parceiros,
         dtypes=sql.dtype_dm_parceiros,
-        out_table='dm_parceiro',
+        out_table='dm_parceiros',
         schema='dw',
         conn_in=db_connector_local_dm,
         conn_out=db_connector_web
@@ -162,4 +164,4 @@ if __name__ == "__main__":
 
 
 
-# cria a classe de pipeline com os metodos precisos para tratar os dados e subir na formatação certa. 
+

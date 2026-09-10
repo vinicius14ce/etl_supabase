@@ -21,9 +21,9 @@ dtype_ouro = {
     'status': VARCHAR(),
     'mercado': VARCHAR(),
     'parceiro': VARCHAR(),
-    'vr_contrato': NUMERIC(precision=18, scale=4),
-    'vr_pagamento': NUMERIC(precision=18, scale=4),
-    'vr_devido': NUMERIC(precision=18, scale=4),
+    'vr_contrato': NUMERIC(),
+    'vr_pagamento': NUMERIC(),
+    'vr_devido': NUMERIC(),
     'status_inad': VARCHAR(),
     'data_carga': TIMESTAMP(),
 }
