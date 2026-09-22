@@ -4,6 +4,7 @@ from app.core.env import Env
 from app.sql import sql
 from app.pipeline.pipeline import correct_value
 #==============================================
+import datetime
 import pandas as pd
 from sqlalchemy import create_engine, text
 
@@ -66,18 +67,9 @@ def main(sql, out_table, schema, dtypes, conn_in, conn_out):
         )
         raise SystemExit("Encerrando o programa devido a erro na geração da URL de conexão.")
 
-    try: # data = db_connector_local.query_text()
-        
+    try: # data = db_connector_local.query_text()     
         data = conn_in.query_text(sql)
         print("Consulta SQL executada com sucesso.")
-        '''
-        x,y = 0, 3
-        for row in data:
-            while x < y:
-                print(row)
-                x=x+1
-        print(100 * '=')
-        '''
     except Exception as error:
         log_error(
             stage="Conexão com Banco de Dados Local",
@@ -160,6 +152,8 @@ if __name__ == "__main__":
         conn_in=db_connector_local_dm,
         conn_out=db_connector_web
         )
+    agora = datetime.datetime.now()
+    print(agora)
     
 
 
