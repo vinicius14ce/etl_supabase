@@ -134,7 +134,7 @@ if __name__ == "__main__":
         conn_in=db_connector_local_dm,
         conn_out=db_connector_web
         )
-
+    
     main(
         sql=sql.dm_estado,
         dtypes=sql.dtype_dm_estado,
@@ -143,7 +143,7 @@ if __name__ == "__main__":
         conn_in=db_connector_local_dm,
         conn_out=db_connector_web
         )
-
+    '''
     main(
         sql=sql.dm_parceiros,
         dtypes=sql.dtype_dm_parceiros,
@@ -152,6 +152,7 @@ if __name__ == "__main__":
         conn_in=db_connector_local_dm,
         conn_out=db_connector_web
         )
+    '''
     agora = datetime.datetime.now()
     print(agora)
     

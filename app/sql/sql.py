@@ -29,7 +29,15 @@ dtype_ouro = {
 }
 #===========================================================
 dm_artista = """
-select * from dm_artista
+select 
+id_artista,
+artista,
+nome,
+link,
+link_csv,
+logo,
+tipo
+from dm_artista
 """
 dtype_dm_artista = {
     'id_artista': INTEGER(),
